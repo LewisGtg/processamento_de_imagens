@@ -21,6 +21,7 @@
 int main(int argc, char **argv)
 {
 	FILE * image;
+	FILE * image_otp;
 	char * input = NULL;
 	char * output = NULL;
 	char tipo_arquivo[2+1];
@@ -84,6 +85,24 @@ int main(int argc, char **argv)
 	if (eh_arquivo_p5(pgm))
 		copia_matriz_p5(pgm, image);
 
-	
+	for (int i = 0; i < pgm->lin; i++)
+		for (int j = 0; j < pgm->col; j++)
+			pgm->matriz_pixels[i][j] = pgm->max - pgm->matriz_pixels[i][j];
+
+	if (output)
+	{
+		image_otp = fopen(output, "w+");
+
+		if (!image_otp)
+		{
+			perror("Erro ao gerar arquivo de saida!");
+			exit(1);
+		}
+
+		fprintf(img_otp, "%s\n", pgm->tipo_arquivo);
+		fprintf(img_otp, "%d %d\n", pgm->col, pgm->lin);
+		fprintf(img_otp, "%d\n", pgm->max);
+
+	}
 
 }
