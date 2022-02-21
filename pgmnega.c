@@ -13,8 +13,10 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include "pgm.h"
+#include "arquivo.h"
 
 int main(int argc, char **argv)
 {
@@ -23,27 +25,64 @@ int main(int argc, char **argv)
 	char * output = NULL;
 	char tipo_arquivo[2+1];
 	int col, lin, max;
-	
-	define_io(argc, argv, input, output)
+	int option;
 
-	image = fopen(input, "r");
-
-	if (!image)
+	//Trata os argumentos de entrada (fazer funcao para isso)
+	while ((option = getopt(argc, argv, "i:o:")) != -1)
 	{
-		perror("Erro ao abrir arquivo de imagem");
-		exit(1);
+		switch(option)
+		{
+			case 'i':
+				input = optarg;
+				break;
+			
+			case 'o':
+				output = optarg;
+				break;
+			
+			default:
+				fprintf(stderr, "Usage: -i input -o output\n");
+				exit(1);
+		}
 	}
 
-	//Leitura de arquivos P2
-	fscanf(image, "%s", tipo_arquivo);
-	fscanf(image, "%d", col);
-	fscanf(image, "%d", lin);
-	fscanf(image, "%d", max);
+	//Verifica se foi passado um arquivo de input como argumento
+	if (input)
+	{
+		//Abre a imagem e pega os dados do pgm (criar funcao)
+		image = fopen(input, "r");
 
-	pgm_t * pgm = inicializa_pgm("P2", 10, 10, 10);	
+		if (!image)
+		{
+				perror("Erro ao abrir arquivo de imagem");
+				exit(1);
+		}
+		
+		//Leitura de arquivos P2
+		fscanf(image, "%s", tipo_arquivo);
+		fscanf(image, "%d", &col);
+		fscanf(image, "%d", &lin);
+		fscanf(image, "%d", &max);
+	}
+
+	else
+	{
+		//Pega os dados da imagem da entrada padrao (criar funcao)
+		fscanf(stdin, "%s", tipo_arquivo);
+		fscanf(stdin, "%d", &col);
+		fscanf(stdin, "%d", &lin);
+		fscanf(stdin, "%d", &max);
+	}
+
+	pgm_t * pgm = inicializa_pgm(tipo_arquivo, col, lin, max);	
 
 	info_pgm(pgm);
+	
+	if (eh_arquivo_p2(pgm))
+		copia_matriz_p2(pgm, image);
 
+	if (eh_arquivo_p5(pgm))
+		copia_matriz_p5(pgm, image);
 
 	
 
