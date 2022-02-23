@@ -16,75 +16,33 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "pgm.h"
-#include "arquivo.h"
+#include "parser.h"
+#include "arquivos.h"
 
 int main(int argc, char **argv)
 {
 	FILE * image;
 	FILE * image_otp;
+
 	char * input = NULL;
 	char * output = NULL;
-	char tipo_arquivo[2+1];
-	int col, lin, max;
-	int option;
 
-	//Trata os argumentos de entrada (fazer funcao para isso)
-	while ((option = getopt(argc, argv, "i:o:")) != -1)
-	{
-		switch(option)
-		{
-			case 'i':
-				input = optarg;
-				break;
-			
-			case 'o':
-				output = optarg;
-				break;
-			
-			default:
-				fprintf(stderr, "Usage: -i input -o output\n");
-				exit(1);
-		}
-	}
+	char * tipo_arquivo;
+	int col, lin, max;
+
+	//Faz o parsing das entradas
+	define_io(argc, argv, &input, &output);
 
 	//Verifica se foi passado um arquivo de input como argumento
-	if (input)
-	{
-		//Abre a imagem e pega os dados do pgm (criar funcao)
-		image = fopen(input, "r");
-
-		if (!image)
-		{
-				perror("Erro ao abrir arquivo de imagem");
-				exit(1);
-		}
+	le_entradas(&image, input, tipo_arquivo, &col, &lin, &max);
 		
-		//Leitura de arquivos P2
-		fscanf(image, "%s", tipo_arquivo);
-		fscanf(image, "%d", &col);
-		fscanf(image, "%d", &lin);
-		fscanf(image, "%d", &max);
-	}
-
-	else
-	{
-		//Pega os dados da imagem da entrada padrao (criar funcao)
-		fscanf(stdin, "%s", tipo_arquivo);
-		fscanf(stdin, "%d", &col);
-		fscanf(stdin, "%d", &lin);
-		fscanf(stdin, "%d", &max);
-	}
-
+	//Inicia o arquivo pgm e copia sua matriz de pixels
 	pgm_t * pgm = inicializa_pgm(tipo_arquivo, col, lin, max);	
-
-	info_pgm(pgm);
 	
-	if (eh_arquivo_p2(pgm))
-		copia_matriz_p2(pgm, image);
+	//Criar função para o bloco, (copia_pgm)
+	copia_matriz(pgm, image, input);
 
-	if (eh_arquivo_p5(pgm))
-		copia_matriz_p5(pgm, image);
-
+	//Aplica o filtro na matriz de pixels
 	for (int i = 0; i < pgm->lin; i++)
 		for (int j = 0; j < pgm->col; j++)
 			pgm->matriz_pixels[i][j] = pgm->max - pgm->matriz_pixels[i][j];
@@ -99,10 +57,18 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 
-		fprintf(img_otp, "%s\n", pgm->tipo_arquivo);
-		fprintf(img_otp, "%d %d\n", pgm->col, pgm->lin);
-		fprintf(img_otp, "%d\n", pgm->max);
+		fprintf(image_otp, "%s\n", pgm->tipo_arquivo);
+		fprintf(image_otp, "%d %d\n", pgm->col, pgm->lin);
+		fprintf(image_otp, "%d\n", pgm->max);
+		
+		for (int i = 0; i < pgm->lin; i++)
+		{
+			for (int j = 0; j < pgm->col; j++)
+				fprintf(image_otp, "%d ", pgm->matriz_pixels[i][j]);
+			fprintf(image_otp, "\n");
 
+
+		}
 	}
 
 }

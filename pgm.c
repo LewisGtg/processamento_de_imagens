@@ -13,6 +13,7 @@ pgm_t * inicializa_pgm(char tipo_arquivo[2+1], int col, int lin, int max)
 		exit(1);
 	}
 
+
 	strcpy(pgm->tipo_arquivo, tipo_arquivo);
 	pgm->col = col;
 	pgm->lin = lin;
@@ -50,7 +51,6 @@ void info_pgm(pgm_t * pgm)
 int eh_arquivo_p2(pgm_t * pgm)
 {
 	return strcmp(pgm->tipo_arquivo, "P2") == 0;
-
 }
 
 int eh_arquivo_p5(pgm_t * pgm)
@@ -58,7 +58,7 @@ int eh_arquivo_p5(pgm_t * pgm)
 	return strcmp(pgm->tipo_arquivo, "P5") == 0;
 }
 
-void copia_matriz_p2(pgm_t * pgm, void * file)
+void copia_matriz_p2_input(pgm_t * pgm, void * file)
 {
 	FILE * image = (FILE *) file;
 	
@@ -67,7 +67,14 @@ void copia_matriz_p2(pgm_t * pgm, void * file)
 			fscanf(image, "%d", &pgm->matriz_pixels[i][j]);
 }
 
-void copia_matriz_p5(pgm_t * pgm, void * file)
+void copia_matriz_p2_stdin(pgm_t * pgm)
+{
+	for (int i = 0; i < pgm->lin; i++)
+		for (int j = 0; j < pgm->col; j++)
+			fscanf(stdin, "%d", &pgm->matriz_pixels[i][j]);
+}
+
+void copia_matriz_p5_input(pgm_t * pgm, void * file)
 {
 	FILE * image = (FILE *) file;
 	
@@ -75,4 +82,30 @@ void copia_matriz_p5(pgm_t * pgm, void * file)
 		for (int j = 0; j < pgm->col; j++)
 			fread(&pgm->matriz_pixels[i][j], 1, 1, image);
 
+}
+
+void copia_matriz_p5_stdin(pgm_t * pgm)
+{
+	for (int i = 0; i < pgm->lin; i++)
+		for (int j = 0; j < pgm->col; j++)
+			fread(&pgm->matriz_pixels[i][j], 1, 1, stdin);
+}
+
+void copia_matriz(pgm_t * pgm, void * image, char * input)
+{
+	if (eh_arquivo_p2(pgm))
+	{
+		if (input)
+			copia_matriz_p2_input(pgm, image);
+		else
+			copia_matriz_p2_stdin(pgm);
+	}
+
+	if (eh_arquivo_p5(pgm))
+	{
+		if (input)
+			copia_matriz_p5_input(pgm, image);
+		else
+			copia_matriz_p5_stdin(pgm);
+	}
 }
