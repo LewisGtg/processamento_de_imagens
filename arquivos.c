@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "arquivos.h"
 #include "pgm.h"
+
+#define LINESIZE 1024
 
 void le_entradas_input(FILE ** image, char * input, char ** tipo, int  *col, int *lin, int *max)
 {
 	*image = fopen(input, "r");
+	char comentario[LINESIZE + 1];
 
 	if (!*image)
 	{
@@ -18,10 +22,12 @@ void le_entradas_input(FILE ** image, char * input, char ** tipo, int  *col, int
 	*tipo = malloc(sizeof(char) * 2 + 2);
 
 	fscanf(*image, "%s", *tipo);
+
+	verifica_comentario(image, tipo);
+
 	fscanf(*image, "%d", col);
 	fscanf(*image, "%d", lin);
 	fscanf(*image, "%d", max);
-	printf("%p\n", *image);
 }
 
 void le_entradas_stdin(char ** tipo, int  *col, int *lin, int *max)
@@ -34,6 +40,20 @@ void le_entradas_stdin(char ** tipo, int  *col, int *lin, int *max)
 	fscanf(stdin, "%d", max);
 }
 
+void verifica_comentario(FILE ** image, char ** tipo)
+{
+	char comentario[LINESIZE + 1];
+
+	if (!strcmp(*tipo, "P5"))
+	{
+		fscanf(*image, "%s", comentario);
+		
+		if (comentario[0] == '#')
+			fgets(comentario, LINESIZE, *image);
+		else
+			fseek(*image, sizeof(char) * 2, SEEK_SET);
+	}
+}
 
 void le_entradas(FILE ** image, char * input, char ** tipo_arquivo, int *col, int *lin,int *max)
 {

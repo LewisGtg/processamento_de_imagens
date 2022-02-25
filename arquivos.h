@@ -13,3 +13,5 @@ void escreve_saidas_p5_otp(FILE * image_otp, void * pgm);
 void escreve_saidas_p2_stdout(void * pgm);
 
 void escreve_saidas_p5_stdout(void * pgm);
+
+void verifica_comentario(FILE ** image, char ** tipo);
