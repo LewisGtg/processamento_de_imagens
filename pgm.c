@@ -1,6 +1,6 @@
+#include <stdio.h>
 #include "pgm.h"
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 
 pgm_t * inicializa_pgm(char tipo_arquivo[2+1], int col, int lin, int max)
@@ -58,13 +58,11 @@ int eh_arquivo_p5(pgm_t * pgm)
 	return strcmp(pgm->tipo_arquivo, "P5") == 0;
 }
 
-void copia_matriz_p2_input(pgm_t * pgm, void * file)
+void copia_matriz_p2_input(pgm_t * pgm, FILE ** image)
 {
-	FILE * image = (FILE *) file;
-	
 	for (int i = 0; i < pgm->lin; i++)
 		for (int j = 0; j < pgm->col; j++)
-			fscanf(image, "%d", &pgm->matriz_pixels[i][j]);
+			fscanf(*image, "%d", &pgm->matriz_pixels[i][j]);
 }
 
 void copia_matriz_p2_stdin(pgm_t * pgm)
@@ -74,14 +72,11 @@ void copia_matriz_p2_stdin(pgm_t * pgm)
 			fscanf(stdin, "%d", &pgm->matriz_pixels[i][j]);
 }
 
-void copia_matriz_p5_input(pgm_t * pgm, void * file)
+void copia_matriz_p5_input(pgm_t * pgm, FILE ** image)
 {
-	FILE * image = (FILE *) file;
-	
 	for (int i = 0; i < pgm->lin; i++)
 		for (int j = 0; j < pgm->col; j++)
-			fread(&pgm->matriz_pixels[i][j], 1, 1, image);
-
+			fread(&pgm->matriz_pixels[i][j], 1, 1, *image);
 }
 
 void copia_matriz_p5_stdin(pgm_t * pgm)
@@ -91,7 +86,7 @@ void copia_matriz_p5_stdin(pgm_t * pgm)
 			fread(&pgm->matriz_pixels[i][j], 1, 1, stdin);
 }
 
-void copia_matriz(pgm_t * pgm, void * image, char * input)
+void copia_matriz(pgm_t * pgm, FILE ** image, char * input)
 {
 	if (eh_arquivo_p2(pgm))
 	{

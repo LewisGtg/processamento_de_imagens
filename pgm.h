@@ -15,12 +15,12 @@ int eh_arquivo_p2(pgm_t * pgm);
 
 int eh_arquivo_p5(pgm_t * pgm);
 
-void copia_matriz(pgm_t * pgm, void * file, char * input);
+void copia_matriz(pgm_t * pgm, FILE ** file, char * input);
 
-void copia_matriz_p2_input(pgm_t * pgm, void * file);
+void copia_matriz_p2_input(pgm_t * pgm, FILE ** file);
 
 void copia_matriz_p2_stdin(pgm_t * pgm);
 
-void copia_matriz_p5_input(pgm_t * pgm, void * file);
+void copia_matriz_p5_input(pgm_t * pgm, FILE ** file);
 
 void copia_matriz_p5_stdin(pgm_t * pgm);
