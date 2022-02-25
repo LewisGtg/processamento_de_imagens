@@ -11,12 +11,13 @@ int main(int argc, char **argv)
 
 	char * input = NULL;
 	char * output = NULL;
+	float limiar;
 
 	char * tipo_arquivo;
 	int col, lin, max;
 
 	//Faz o parsing das entradas
-	define_io(argc, argv, &input, &output, NULL, NULL, NULL);
+	define_io(argc, argv, &input, &output, NULL, &limiar, NULL);
 
 	//Verifica se foi passado um arquivo de input como argumento
 	le_entradas(&image, input, &tipo_arquivo, &col, &lin, &max);

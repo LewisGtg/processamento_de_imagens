@@ -9,7 +9,6 @@
 void le_entradas_input(FILE ** image, char * input, char ** tipo, int  *col, int *lin, int *max)
 {
 	*image = fopen(input, "r");
-	char comentario[LINESIZE + 1];
 
 	if (!*image)
 	{

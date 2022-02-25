@@ -11,13 +11,13 @@ int main(int argc, char **argv)
 
 	char * input = NULL;
 	char * output = NULL;
+	int angulo;
 
 	char * tipo_arquivo;
 	int col, lin, max;
 
 	//Faz o parsing das entradas
-	define_io(argc, argv, &input, &output, NULL, NULL, NULL);
-
+	define_io(argc, argv, &input, &output, &angulo, NULL, NULL);
 	//Verifica se foi passado um arquivo de input como argumento
 	le_entradas(&image, input, &tipo_arquivo, &col, &lin, &max);
 
@@ -28,9 +28,6 @@ int main(int argc, char **argv)
 	copia_matriz(pgm, &image, input);
 
 	//Aplica o filtro negativo na matriz de pixels
-	for (int i = 0; i < pgm->lin; i++)
-		for (int j = 0; j < pgm->col; j++)
-			pgm->matriz_pixels[i][j] = pgm->max - pgm->matriz_pixels[i][j];
 
 	//Copia o pgm com o filtro aplicado para algum arquivo de saida
 	escreve_saidas(pgm, output);
