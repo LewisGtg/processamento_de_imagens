@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 
 	char * input = NULL;
 	char * output = NULL;
-	int angulo;
+	float angulo;
 
 	char * tipo_arquivo;
 	int col, lin, max;

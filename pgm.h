@@ -24,3 +24,4 @@ void copia_matriz_p2_stdin(pgm_t * pgm);
 void copia_matriz_p5_input(pgm_t * pgm, FILE ** file);
 
 void copia_matriz_p5_stdin(pgm_t * pgm);
+
