@@ -7,12 +7,12 @@
 #define MAX_NAME_SIZE 100
 #define MAX 100
 
-void define_io(int argc, char **argv, char ** input, char ** output, float * angulo, float * limiar, float * media)
+void define_io(int argc, char **argv, char ** input, char ** output, float * angulo, float * limiar, int * mediana)
 {
 	int option;
 	char * angulo_char = NULL;
 	char * limiar_char = NULL;
-	char * media_char = NULL;
+	char * mediana_char = NULL;
 
 	while ((option = getopt(argc, argv, "i:o:a:l:m:")) != -1)
 	{
@@ -47,10 +47,10 @@ void define_io(int argc, char **argv, char ** input, char ** output, float * ang
 				break;
 
 			case 'm':
-				if (media)
+				if (mediana)
 				{
-					media_char = optarg;
-					*media = atof(media_char);
+					mediana_char = optarg;
+					*mediana = atoi(mediana_char);
 				}
 
 				break;
