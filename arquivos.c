@@ -43,15 +43,12 @@ void verifica_comentario(FILE ** image, char ** tipo)
 {
 	char comentario[LINESIZE + 1];
 
-	if (!strcmp(*tipo, "P5"))
-	{
-		fscanf(*image, "%s", comentario);
-		
-		if (comentario[0] == '#')
-			fgets(comentario, LINESIZE, *image);
-		else
-			fseek(*image, sizeof(char) * 2, SEEK_SET);
-	}
+	fscanf(*image, "%s", comentario);
+
+	if (comentario[0] == '#')
+		fgets(comentario, LINESIZE, *image);
+	else
+		fseek(*image, sizeof(char) * 2, SEEK_SET);
 }
 
 void le_entradas(FILE ** image, char * input, char ** tipo_arquivo, int *col, int *lin,int *max)

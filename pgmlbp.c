@@ -37,12 +37,15 @@ int main(int argc, char **argv)
 	matriz_copia = inicializa_matriz(col, lin);
 	copia_matriz_pgm(pgm, matriz_copia);
 
-	//Aplica o filtro negativo na matriz de pixels
+	//Aplica o filtro LBP
+	//Passa por todos os pixels que nao estejam na borda
 	for (int i = 1; i < pgm->lin - 1; i++)
 		for (int j = 1; j < pgm->col - 1; j++)
 		{
 			int soma = 0;
 			int exp = 1;
+	
+			//Passa por todos os vizinhos do pixel atual
 			for (int linha = i - 1; linha < i + 2; linha ++)
 			{
 				for (int coluna = j - 1; coluna < j + 2; coluna++)
