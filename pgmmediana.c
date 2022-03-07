@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 	define_io(argc, argv, &input, &output, NULL, NULL, &mediana);
 
 	//Verifica se o valor passado eh impar
-	if ((int)mediana % 2 == 0)
+	if (mediana % 2 == 0)
 	{
 		perror("Deve ser passado um valor impar para a mediana");
 		exit(1);

@@ -17,7 +17,7 @@ int pgm_quadrado(pgm_t * pgm);
 void redimensiona_pgm(pgm_t * pgm, int col, int lin);
 
 //Identifica o maior e menor valor que um pixel pode assumir apos ser rotacionado
-void identifica_limites(double angulo_rad, int col, int lin, int * max_col, int * max_lin, int * repara_col);
+void identifica_limites(double angulo_rad, int col, int lin, int * max_col, int * max_lin, int * repara_col, int * repara_lin);
 
 int main(int argc, char **argv)
 {
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 
 	double angulo_graus = 90;
 	double angulo_rad;
-	int max_col, max_lin, repara_col;
+	int max_col, max_lin, repara_col, repara_lin;
 
 	int ** matriz_copia;
 
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 	matriz_copia = inicializa_matriz(col, lin);
 	copia_matriz_pgm(pgm, matriz_copia);
 
-	identifica_limites(angulo_rad, col, lin, &max_col, &max_lin, &repara_col); 
+	identifica_limites(angulo_rad, col, lin, &max_col, &max_lin, &repara_col, &repara_lin); 
 
 	// Caso o pgm nao seja quadrado e o angulo de rotacao seja 90, apenas eh trocada linhas por colunas e vice versa
 	if (!pgm_quadrado(pgm) && angulo_graus == 90)
@@ -69,8 +69,8 @@ int main(int argc, char **argv)
 		{
 			int novo_x = x * cos(angulo_rad) + y * sin(angulo_rad);
 			int novo_y = x * -sin(angulo_rad) + y * cos(angulo_rad);
-			
-			pgm->matriz_pixels[novo_x][novo_y + repara_col] = matriz_copia[x][y];
+
+			pgm->matriz_pixels[novo_x + repara_lin][novo_y + repara_col] = matriz_copia[x][y];
 		}
 	}
 
@@ -104,11 +104,12 @@ void redimensiona_pgm(pgm_t * pgm, int col, int lin)
 			pgm->matriz_pixels[i][j] = 255;
 }
 
-void identifica_limites(double angulo_rad, int col, int lin, int * max_col, int * max_lin, int * repara_col)
+void identifica_limites(double angulo_rad, int col, int lin, int * max_col, int * max_lin, int * repara_col, int * repara_lin)
 {
 	*max_col = 0;
 	*max_lin = 0;
 	*repara_col = 0;
+	*repara_lin = 0;
 
 	for (int x = 0; x < lin; x++)
 		for (int y = 0; y < col; y++)
@@ -119,6 +120,9 @@ void identifica_limites(double angulo_rad, int col, int lin, int * max_col, int 
 			if (novo_x >= *max_lin)
 				*max_lin = novo_x + 1;
 
+			if (novo_x <= *repara_lin)
+				*repara_lin = novo_x;
+
 			if (novo_y <= *repara_col)
 				*repara_col = novo_y;
 
@@ -127,7 +131,8 @@ void identifica_limites(double angulo_rad, int col, int lin, int * max_col, int 
 		}
 
 	*repara_col = abs(*repara_col);
-	printf("%d\n", *repara_col);
+	*repara_lin = abs(*repara_lin);
 
 	*max_col += *repara_col + 1;
+	*max_lin += *repara_lin + 1;
 }
