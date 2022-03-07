@@ -1,17 +1,13 @@
-void le_entradas_input(FILE ** image, char * input, char ** tipo, int  *col, int *lin, int *max);
+#ifndef __ARQ__
+#define __ARQ__
 
-void le_entradas_stdin(char ** tipo, int  *col, int *lin, int *max);
-
+//Le as propriedades do arquivo PGM
 void le_entradas(FILE ** image, char * input, char ** tipo_arquivo, int *col, int *lin,int *max);
 
+//Cria um arquivo contendo o PGM com o filtro aplicado
 void escreve_saidas(void * pgm, char * output);
 
-void escreve_saidas_p2_otp(FILE * image_otp, void * pgm);
+//Fecha o arquivo passado como input, caso tenha sido passado
+void fecha_arquivo(FILE * image, char * input);
 
-void escreve_saidas_p5_otp(FILE * image_otp, void * pgm);
-
-void escreve_saidas_p2_stdout(void * pgm);
-
-void escreve_saidas_p5_stdout(void * pgm);
-
-void verifica_comentario(FILE ** image, char ** tipo);
+#endif
