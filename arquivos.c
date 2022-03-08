@@ -6,8 +6,46 @@
 
 #define LINESIZE 1024
 
+//Abre um arquivo e retorna seu ponteiro
+static FILE * abre_arquivo(char * nome_arq, char tipo_saida[2], char tipo[3])
+{
+	FILE * image;
+
+	//Verifica se foi passado o nome do arquivo como argumento
+	if (nome_arq)
+	{
+		image = fopen(nome_arq, tipo);
+
+		if (!image)
+		{
+			perror("Erro ao abrir arquivo de imagem");
+			exit(1);
+		}
+	}
+
+	//Retorna um ponteiro para entrada/saida padrao
+	else
+	{
+		if (tipo_saida[0] == 'i')
+			image = stdin;
+		
+		else if (tipo_saida[0] == 'o')
+			image = stdout;
+	}
+
+	return image;
+}
+
+void fecha_arquivo(FILE * image, char * input)
+{
+	//Verifica se foi passado um arquivo de input
+	if (input)
+		//Fecha o arquivo passado
+		fclose(image);
+}
+
 //Verifica se ha comentario apos a definicao do tipo do PGM
-static void verifica_comentario(FILE ** image)
+void verifica_comentario(FILE ** image)
 {
 	char comentario[LINESIZE + 1];
 
@@ -24,7 +62,7 @@ static void verifica_comentario(FILE ** image)
 }
 
 //Copia o arquivo PGM tipo P2 com filtro aplicado para um arquivo
-static void escreve_matriz_p2(FILE * image_otp, void * void_pgm)
+void escreve_matriz_p2(FILE * image_otp, void * void_pgm)
 {
 	pgm_t * pgm = void_pgm;
 
@@ -37,7 +75,7 @@ static void escreve_matriz_p2(FILE * image_otp, void * void_pgm)
 }
 
 //Copia o arquivo PGM tipo P5 com filtro aplicado para um arquivo 
-static void escreve_matriz_p5(FILE * image_otp, void * void_pgm)
+void escreve_matriz_p5(FILE * image_otp, void * void_pgm)
 {
 	pgm_t * pgm = void_pgm;
 
@@ -50,19 +88,7 @@ static void escreve_matriz_p5(FILE * image_otp, void * void_pgm)
 //Chama as funcoes de leitura de arquivo por input ou stdin, de acordo com oque foi passado
 void le_entradas(FILE ** image, char * input, char ** tipo_arquivo, int *col, int *lin,int *max)
 {
-	if (input)
-	{
-		*image = fopen(input, "r");
-
-		if (!*image)
-		{
-			perror("Erro ao abrir arquivo de imagem");
-			exit(1);
-		}
-	}
-
-	else
-		*image = stdin;
+	*image = abre_arquivo(input, "i", "r");
 
 	//Aloca memoria para a string que representa o tipo de arquivo
 	*tipo_arquivo = malloc(sizeof(char) * 2 + 2);
@@ -80,25 +106,8 @@ void le_entradas(FILE ** image, char * input, char ** tipo_arquivo, int *col, in
 //Chama as funcoes de escrita de arquivos por output ou stdout, de acordo com oque foi passado
 void escreve_saidas(void * void_pgm, char * output)
 {
-	FILE * image_otp;
+	FILE * image_otp = abre_arquivo(output, "o", "w+");
 	pgm_t * pgm = void_pgm;
-
-	//Verifica se foi passado arquivo de output como argumento
-	if (output)
-	{
-		//Abre um arquivo para escrita e testa se deu certo
-		image_otp = fopen(output, "w+");
-
-		if (!image_otp)
-		{
-			perror("Erro ao abrir arquivo de output");
-			exit(1);
-		}
-
-	}
-
-	else
-		image_otp = stdin;
 
 	//Copia as propriedades do PGM para o output
 	fprintf(image_otp, "%s\n", pgm->tipo_arquivo);
@@ -110,12 +119,4 @@ void escreve_saidas(void * void_pgm, char * output)
 		escreve_matriz_p2(image_otp, pgm);
 	else
 		escreve_matriz_p5(image_otp, pgm);
-}
-
-void fecha_arquivo(FILE * image, char * input)
-{
-	//Verifica se foi passado um arquivo de input
-	if (input)
-		//Fecha o arquivo passado
-		fclose(image);
 }
