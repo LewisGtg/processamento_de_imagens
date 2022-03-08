@@ -4,35 +4,19 @@
 #include <string.h>
 
 //Funcao interna para copiar a matriz da imagem PGM do tipo P2 passada como argumento
-static void copia_matriz_p2_input(pgm_t * pgm, FILE ** image)
+static void copia_matriz_p2(pgm_t * pgm, FILE ** image)
 {
 	for (int i = 0; i < pgm->lin; i++)
 		for (int j = 0; j < pgm->col; j++)
 			fscanf(*image, "%d", &pgm->matriz_pixels[i][j]);
 }
 
-//Funcao interna para copiar a matriz da imagem PGM do tipo P2 passada pelo stdin
-static void copia_matriz_p2_stdin(pgm_t * pgm)
-{
-	for (int i = 0; i < pgm->lin; i++)
-		for (int j = 0; j < pgm->col; j++)
-			fscanf(stdin, "%d", &pgm->matriz_pixels[i][j]);
-}
-
 //Funcao interna para copiar a matriz da imagem PGM do tipo P5 passada como argumento
-static void copia_matriz_p5_input(pgm_t * pgm, FILE ** image)
+static void copia_matriz_p5(pgm_t * pgm, FILE ** image)
 {
 	for (int i = 0; i < pgm->lin; i++)
 		for (int j = 0; j < pgm->col; j++)
 			fread(&pgm->matriz_pixels[i][j], 1, 1, *image);
-}
-
-//Funcao interna para copiar a matriz da imagem PGM do tipo P5 passada pelo stdin
-static void copia_matriz_p5_stdin(pgm_t * pgm)
-{
-	for (int i = 0; i < pgm->lin; i++)
-		for (int j = 0; j < pgm->col; j++)
-			fread(&pgm->matriz_pixels[i][j], 1, 1, stdin);
 }
 
 pgm_t * inicializa_pgm(char tipo_arquivo[2+1], int col, int lin, int max)
@@ -106,18 +90,8 @@ int eh_arquivo_p5(pgm_t * pgm)
 void copia_matriz(pgm_t * pgm, FILE ** image, char * input)
 {
 	if (eh_arquivo_p2(pgm))
-	{
-		if (input)
-			copia_matriz_p2_input(pgm, image);
-		else
-			copia_matriz_p2_stdin(pgm);
-	}
+		copia_matriz_p2(pgm, image);
 
 	if (eh_arquivo_p5(pgm))
-	{
-		if (input)
-			copia_matriz_p5_input(pgm, image);
-		else
-			copia_matriz_p5_stdin(pgm);
-	}
+			copia_matriz_p5(pgm, image);
 }
