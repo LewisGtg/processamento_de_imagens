@@ -74,6 +74,7 @@ int main(int argc, char **argv)
 		}
 	}
 
+
 	//Copia o pgm com o filtro aplicado para algum arquivo de saida
 	escreve_saidas(pgm, output);
 }

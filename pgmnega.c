@@ -16,6 +16,7 @@ int main(int argc, char **argv)
 	int col, lin, max;
 
 	//Faz o parsing das entradas
+	//define_io(argc, argv, &input, &output, NULL, NULL, NULL);
 	define_io(argc, argv, &input, &output, NULL, NULL, NULL);
 
 	//Verifica se foi passado um arquivo de input como argumento

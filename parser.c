@@ -63,3 +63,25 @@ void define_io(int argc, char **argv, char ** input, char ** output, double * an
 	}
 }
 
+void define_io_2(int argc, char **argv, char ** input, char ** output, double * angulo, float * limiar, int * mediana)
+{
+	for (int i = 1; i < argc; i++)
+	{
+		printf("%s\n", argv[i]);
+
+		if (!strcmp("-i", argv[i]))
+		{
+			int tamanho_prox = strlen(argv[i+1])
+
+			*input = malloc(sizeof(char) * MAX_NAME_SIZE);
+			strcpy(*input, argv[i+1]);
+		}
+			
+		if (!strcmp("-o", argv[i]))
+		{
+			*output = malloc(sizeof(char) * MAX_NAME_SIZE);
+			strcpy(*output, argv[i+1]);
+		}
+	
+}
+
