@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 		redimensiona_pgm(pgm, lin, col);
 
 
-	// Caso o angulo nao seja de multiplo de 90, redimensiona o pgm o valor minimo e maximo que um pixel pode assumir
+	// Caso o angulo nao seja de multiplo de 90, redimensiona o pgm com o valor minimo e maximo que um pixel pode assumir
 	if (!eh_mult_noventa(angulo_graus))
 	{
 		redimensiona_pgm(pgm, max_col, max_lin);

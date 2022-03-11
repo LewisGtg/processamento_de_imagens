@@ -9,7 +9,7 @@
 #define MAX 100
 
 // Verifica se o argumento existe após a flag
-void verifica_arg(int argc, int atual)
+static void verifica_arg(int argc, int atual)
 {
 	if (atual + 1 >= argc)
 	{

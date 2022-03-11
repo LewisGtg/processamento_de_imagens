@@ -47,7 +47,7 @@ void fecha_arquivo(FILE * image, char * input)
 }
 
 //Verifica se ha comentario apos a definicao do tipo do PGM
-void verifica_comentario(FILE ** image)
+static void verifica_comentario(FILE ** image)
 {
 	char comentario[LINESIZE + 1];
 
@@ -81,7 +81,7 @@ static void le_matriz_p5(pgm_t * pgm, FILE ** image)
 
 // Funções para escrever a matriz da struct PGM para o arquivo de saida. 
 // Escreve matriz do tipo p2
-void escreve_matriz_p2(FILE * image_otp, pgm_t * pgm)
+static void escreve_matriz_p2(FILE * image_otp, pgm_t * pgm)
 {
 	for (int i = 0; i < pgm->lin; i++)
 	{	
@@ -92,7 +92,7 @@ void escreve_matriz_p2(FILE * image_otp, pgm_t * pgm)
 }
 
 // Escreve matriz do tipo p5
-void escreve_matriz_p5(FILE * image_otp, pgm_t * pgm)
+static void escreve_matriz_p5(FILE * image_otp, pgm_t * pgm)
 {
 	for (int i = 0; i < pgm->lin; i++)
 		for (int j = 0; j < pgm->col; j++)
