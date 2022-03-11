@@ -16,6 +16,9 @@ void destroi_pgm(pgm_t * pgm);
 //Inicializa uma matriz para armazenar "pixels" do pgm
 int **inicializa_matriz(int col, int lin);
 
+//Libera memoria alocada para matriz
+void destroi_matriz(int ** matriz);
+
 //Printa as propriedades do arquivo pgm
 void info_pgm(pgm_t * pgm);
 
@@ -25,7 +28,6 @@ int eh_arquivo_p2(pgm_t * pgm);
 //Verifica se o arquivo pgm eh do tipo P5
 int eh_arquivo_p5(pgm_t * pgm);
 
-//Copia a matriz da imagem pgm para a struct pgm
-void copia_matriz(pgm_t * pgm, FILE ** file, char * input);
-
+//Copia a matriz do pgm para outra matriz passada
+void copia_matriz_pgm(pgm_t * pgm, int ** matriz);
 #endif

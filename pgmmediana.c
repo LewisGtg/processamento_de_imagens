@@ -5,9 +5,6 @@
 #include "parser.h"
 #include "arquivos.h"
 
-//Copia a matriz de pixels do pgm para uma outra matriz qualquer
-void copia_matriz_pgm(pgm_t * pgm, int ** matriz);
-
 //Funcao utilizada pelo qsort para ordenar um vetor de inteiros
 int compara(const void *a, const void *b);
 
@@ -25,7 +22,7 @@ int main(int argc, char **argv)
 	int valor_mediana;
 
 	//Define a distancia do pixel ate a borda da mascara
-	int boundary_limit; 
+	int limite; 
 
 	//Numero que elementos que compoe a mascara
 	int tam_mascara;
@@ -40,44 +37,44 @@ int main(int argc, char **argv)
 	int col, lin, max;
 
 	//Faz o parsing das entradas
-	define_io(argc, argv, &input, &output, NULL, NULL, &mediana);
+	parser(argc, argv, &input, &output, NULL, NULL, &mediana);
 
 	//Verifica se o valor passado eh impar
-	if (mediana % 2 == 0)
+	if (mediana % 2 == 0 || mediana < 3)
 	{
-		perror("Deve ser passado um valor impar para a mediana");
+		perror("Deve ser passado um valor impar maior que zero para a mediana");
 		exit(1);
 	}
 
 	//Le as propriedades do arquivo pgm, sem ler a matriz de pixels
-	le_entradas(&image, input, &tipo_arquivo, &col, &lin, &max);
+	le_propriedades_pgm(&image, input, &tipo_arquivo, &col, &lin, &max);
 
 	//Inicia a struct pgm com as propriedades definidas
 	pgm_t * pgm = inicializa_pgm(tipo_arquivo, col, lin, max);	
 
 	//Copia a matriz de pixels para a struct pgm
-	copia_matriz(pgm, &image, input);
+	le_matriz_pgm(pgm, &image, input);
 
 	//Cria uma copia para a matriz de pixels do pgm
 	matriz_copia = inicializa_matriz(col, lin);
 	copia_matriz_pgm(pgm, matriz_copia);
 
 
-	boundary_limit = (mediana / 2);
+	limite = (mediana / 2);
 	tam_mascara = mediana * mediana;
 
 	valores = malloc(sizeof(int) * tam_mascara);
 
 	//Aplica o filtro de mediana
 	//Inicia e termina em linhas que respeitam o tamanho da mascara
-	for (int i = boundary_limit; i < pgm->lin - boundary_limit; i++)
+	for (int i = limite; i < pgm->lin - limite; i++)
 		//Inicia e termina em colunas que respeitam o tamanho da mascara
-		for (int j = boundary_limit; j < pgm->col - boundary_limit; j++)
+		for (int j = limite; j < pgm->col - limite; j++)
 		{
 			//Passa por todos os vizinhos dentro do limite da mascara, e armazena seus valores em um vetor
 			int cont = 0;
-			for (int linha = i - boundary_limit; linha < mediana + i - boundary_limit; linha++)
-			   for (int coluna = j - boundary_limit; coluna < mediana + j - boundary_limit; coluna++)
+			for (int linha = i - limite; linha < mediana + i - limite; linha++)
+			   for (int coluna = j - limite; coluna < mediana + j - limite; coluna++)
 			   {
 					valores[cont] = matriz_copia[linha][coluna];
 					cont++;
@@ -92,14 +89,13 @@ int main(int argc, char **argv)
 		}
 
 	//Copia o pgm com o filtro aplicado para algum arquivo de saida
-	escreve_saidas(pgm, output);
-}
-
-void copia_matriz_pgm(pgm_t * pgm, int ** matriz)
-{
-	for (int i = 0; i < pgm->lin; i++)
-		for (int j = 0; j < pgm->col; j++)
-			matriz[i][j] = pgm->matriz_pixels[i][j];
+	gera_pgm(pgm, output);
+	
+	//Fecha arquivo e desaloca estruturas usadas
+	free(valores);
+	fecha_arquivo(image, input);
+	destroi_matriz(matriz_copia);
+	destroi_pgm(pgm);
 }
 
 int compara(const void *a, const void *b)

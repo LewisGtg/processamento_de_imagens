@@ -5,9 +5,6 @@
 #include "parser.h"
 #include "arquivos.h"
 
-//Copia a matriz de pixels do pgm para uma outra matriz qualquer
-void copia_matriz_pgm(pgm_t * pgm, int ** matriz);
-
 //Verifica se a celula (pixel) da matriz em dado endereco esta no meio, ou seja, em nenhuma borda
 int pixel_central(pgm_t * pgm, int lin, int col);
 
@@ -52,16 +49,16 @@ int main(int argc, char **argv)
 	int col, lin, max;
 
 	//Faz o parsing das entradas
-	define_io(argc, argv, &input, &output, NULL, NULL, NULL);
+	parser(argc, argv, &input, &output, NULL, NULL, NULL);
 
 	//Le as propriedades do arquivo pgm, sem ler a matriz de pixels
-	le_entradas(&image, input, &tipo_arquivo, &col, &lin, &max);
+	le_propriedades_pgm(&image, input, &tipo_arquivo, &col, &lin, &max);
 
 	//Inicia a struct pgm com as propriedades definidas
 	pgm_t * pgm = inicializa_pgm(tipo_arquivo, col, lin, max);	
 
 	//Copia a matriz de pixels para a struct pgm
-	copia_matriz(pgm, &image, input);
+	le_matriz_pgm(pgm, &image, input);
 
 	//Cria uma copia para a matriz de pixels do pgm
 	matriz_copia = inicializa_matriz(col, lin);
@@ -93,14 +90,13 @@ int main(int argc, char **argv)
 		}
 
 	//Copia o pgm com o filtro aplicado para algum arquivo de saida
-	escreve_saidas(pgm, output);
-}
+	gera_pgm(pgm, output);
 
-void copia_matriz_pgm(pgm_t * pgm, int ** matriz)
-{
-	for (int i = 0; i < pgm->lin; i++)
-		for (int j = 0; j < pgm->col; j++)
-			matriz[i][j] = pgm->matriz_pixels[i][j];
+	
+	//Fecha arquivo e desaloca estruturas usadas
+	fecha_arquivo(image, input);
+	destroi_matriz(matriz_copia);
+	destroi_pgm(pgm);
 }
 
 int pixel_central(pgm_t * pgm, int i, int j)

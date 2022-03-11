@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "arquivos.h"
-#include "pgm.h"
 
 #define LINESIZE 1024
 
-//Abre um arquivo e retorna seu ponteiro
+//Abre um arquivo para servir como input ou output, dependendo do parametro passado
 static FILE * abre_arquivo(char * nome_arq, char tipo_saida[2], char tipo[3])
 {
 	FILE * image;
@@ -14,6 +13,7 @@ static FILE * abre_arquivo(char * nome_arq, char tipo_saida[2], char tipo[3])
 	//Verifica se foi passado o nome do arquivo como argumento
 	if (nome_arq)
 	{
+		//Abre arquivo e testa se deu certo
 		image = fopen(nome_arq, tipo);
 
 		if (!image)
@@ -38,10 +38,12 @@ static FILE * abre_arquivo(char * nome_arq, char tipo_saida[2], char tipo[3])
 
 void fecha_arquivo(FILE * image, char * input)
 {
-	//Verifica se foi passado um arquivo de input
+	//Verifica se foi passado um arquivo de input e o fecha
 	if (input)
-		//Fecha o arquivo passado
+	{
 		fclose(image);
+		free(input);
+	}
 }
 
 //Verifica se ha comentario apos a definicao do tipo do PGM
@@ -49,6 +51,7 @@ void verifica_comentario(FILE ** image)
 {
 	char comentario[LINESIZE + 1];
 
+	//Le o possivel comentario
 	fscanf(*image, "%s", comentario);
 
 	//Verifica se foi lido algum comentario
@@ -61,11 +64,25 @@ void verifica_comentario(FILE ** image)
 		fseek(*image, sizeof(char) * 2, SEEK_SET);
 }
 
-//Copia o arquivo PGM tipo P2 com filtro aplicado para um arquivo
-void escreve_matriz_p2(FILE * image_otp, void * void_pgm)
+static void le_matriz_p2(pgm_t * pgm, FILE ** image)
 {
-	pgm_t * pgm = void_pgm;
+	for (int i = 0; i < pgm->lin; i++)
+		for (int j = 0; j < pgm->col; j++)
+			fscanf(*image, "%d", &pgm->matriz_pixels[i][j]);
+}
 
+//Funcao interna para copiar a matriz da imagem PGM do tipo P5 passada como argumento
+static void le_matriz_p5(pgm_t * pgm, FILE ** image)
+{
+	for (int i = 0; i < pgm->lin; i++)
+		for (int j = 0; j < pgm->col; j++)
+			fread(&pgm->matriz_pixels[i][j], 1, 1, *image);
+}
+
+// Funções para escrever a matriz da struct PGM para o arquivo de saida. 
+// Escreve matriz do tipo p2
+void escreve_matriz_p2(FILE * image_otp, pgm_t * pgm)
+{
 	for (int i = 0; i < pgm->lin; i++)
 	{	
 		for (int j = 0; j < pgm->col; j++)
@@ -74,19 +91,17 @@ void escreve_matriz_p2(FILE * image_otp, void * void_pgm)
 	}
 }
 
-//Copia o arquivo PGM tipo P5 com filtro aplicado para um arquivo 
-void escreve_matriz_p5(FILE * image_otp, void * void_pgm)
+// Escreve matriz do tipo p5
+void escreve_matriz_p5(FILE * image_otp, pgm_t * pgm)
 {
-	pgm_t * pgm = void_pgm;
-
-	//Copia a matriz de pixels do PGM para o output
 	for (int i = 0; i < pgm->lin; i++)
 		for (int j = 0; j < pgm->col; j++)
 			fwrite(&pgm->matriz_pixels[i][j], 1, 1, image_otp);
 }
 
-//Chama as funcoes de leitura de arquivo por input ou stdin, de acordo com oque foi passado
-void le_entradas(FILE ** image, char * input, char ** tipo_arquivo, int *col, int *lin,int *max)
+// Funções de leitura e escrita de arquivos
+// Le as propriedades do pgm (tipo, quantidade de colunas e linhas, e valor maximo)
+void le_propriedades_pgm(FILE ** image, char * input, char ** tipo_arquivo, int *col, int *lin,int *max)
 {
 	*image = abre_arquivo(input, "i", "r");
 
@@ -103,11 +118,19 @@ void le_entradas(FILE ** image, char * input, char ** tipo_arquivo, int *col, in
 	fscanf(*image, "%d", max);
 }
 
-//Chama as funcoes de escrita de arquivos por output ou stdout, de acordo com oque foi passado
-void escreve_saidas(void * void_pgm, char * output)
+void le_matriz_pgm(pgm_t * pgm, FILE ** image, char * input)
+{
+	if (eh_arquivo_p2(pgm))
+		le_matriz_p2(pgm, image);
+
+	if (eh_arquivo_p5(pgm))
+		le_matriz_p5(pgm, image);
+}
+
+// Escreve as propriedades e matriz do pgm no arquivo de saida
+void gera_pgm(pgm_t * pgm, char * output)
 {
 	FILE * image_otp = abre_arquivo(output, "o", "w+");
-	pgm_t * pgm = void_pgm;
 
 	//Copia as propriedades do PGM para o output
 	fprintf(image_otp, "%s\n", pgm->tipo_arquivo);
@@ -119,4 +142,6 @@ void escreve_saidas(void * void_pgm, char * output)
 		escreve_matriz_p2(image_otp, pgm);
 	else
 		escreve_matriz_p5(image_otp, pgm);
+
+	fecha_arquivo(image_otp, output);
 }
