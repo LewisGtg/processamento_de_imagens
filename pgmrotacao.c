@@ -69,8 +69,9 @@ int main(int argc, char **argv)
 		desliga_pixels(pgm);
 	}
 
+
 	//Aplica o filtro de rotacao 
-	if (!eh_mult_noventa(angulo_graus))
+/*	if (!eh_mult_noventa(angulo_graus))
 	{
 		for (int x = 0; x < lin; x++)
 		{
@@ -83,23 +84,21 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-
+*/
+	int count = 0;
 	identifica_limites(pgm, -angulo_rad, &max_col, &max_lin, &repara_col, &repara_lin); 
 	for (int x = 0; x < pgm->lin; x++)
 	{
 		for (int y = 0; y < pgm->col; y++)
 		{
-			if (pgm->matriz_pixels[x][y] == -1)
-				pgm->matriz_pixels[x][y] = 255;
-			else
-			{
-				int antigo_x = x * cos(-angulo_rad) + y * sin(-angulo_rad);
-				int antigo_y = x * fabs(-sin(-angulo_rad)) + y * fabs(cos(-angulo_rad));
+			int antigo_x = (x * cos(-angulo_rad) + y * sin(-angulo_rad)) + repara_lin ;
+			int antigo_y = (x * -sin(-angulo_rad) + y * cos(-angulo_rad)) - repara_col;
 
-				printf("%d %d %d %d \n", antigo_x, antigo_y, x, repara_col);
+			if (antigo_x >= 0 && antigo_x < lin && antigo_y >= 0 && antigo_y < col)
+				printf("%d ", matriz_copia[antigo_x][antigo_y]);
 
-				//pgm->matriz_pixels[x][y] = matriz_copia[x][y];
-			}
+			printf("Atual: (%d, %d) Antigo: (%d, %d) Reparadores: (%d, %d)\n", x, y, antigo_x, antigo_y,  repara_lin - 1, repara_col);
+			//pgm->matriz_pixels[x][y] = matriz_copia[antigo_x][antigo_y];
 		}
 	}
 
