@@ -23,16 +23,16 @@ int main(int argc, char **argv)
 	int col, lin, max;
 
 	//Faz o parsing das entradas
-	define_io(argc, argv, &input, &output, NULL, &limiar, NULL);
+	parser(argc, argv, &input, &output, NULL, &limiar, NULL);
 
 	//Le as propriedades do arquivo pgm, sem ler a matriz de pixels
-	le_entradas(&image, input, &tipo_arquivo, &col, &lin, &max);
+	le_propriedades_pgm(&image, input, &tipo_arquivo, &col, &lin, &max);
 
 	//Inicia a struct pgm com as propriedades definidas
 	pgm_t * pgm = inicializa_pgm(tipo_arquivo, col, lin, max);	
 
 	//Copia a matriz de pixels da imagem para a struct pgm
-	copia_matriz(pgm, &image, input);
+	le_matriz_pgm(pgm, &image, input);
 
 	//Usuario digitou valor inválido para o limiar
 	if (limiar < 0 || limiar > 1)
@@ -58,5 +58,9 @@ int main(int argc, char **argv)
 		}
 
 	//Copia o pgm com o filtro aplicado para algum arquivo de saida
-	escreve_saidas(pgm, output);
+	gera_pgm(pgm, output);
+	
+	//Fecha arquivo e desaloca estruturas usadas
+	fecha_arquivo(image, input);
+	destroi_pgm(pgm);
 }

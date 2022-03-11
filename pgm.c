@@ -4,20 +4,6 @@
 #include <string.h>
 
 //Funcao interna para copiar a matriz da imagem PGM do tipo P2 passada como argumento
-static void copia_matriz_p2(pgm_t * pgm, FILE ** image)
-{
-	for (int i = 0; i < pgm->lin; i++)
-		for (int j = 0; j < pgm->col; j++)
-			fscanf(*image, "%d", &pgm->matriz_pixels[i][j]);
-}
-
-//Funcao interna para copiar a matriz da imagem PGM do tipo P5 passada como argumento
-static void copia_matriz_p5(pgm_t * pgm, FILE ** image)
-{
-	for (int i = 0; i < pgm->lin; i++)
-		for (int j = 0; j < pgm->col; j++)
-			fread(&pgm->matriz_pixels[i][j], 1, 1, *image);
-}
 
 pgm_t * inicializa_pgm(char tipo_arquivo[2+1], int col, int lin, int max)
 {
@@ -37,13 +23,14 @@ pgm_t * inicializa_pgm(char tipo_arquivo[2+1], int col, int lin, int max)
 	pgm->max = max;
 	pgm->matriz_pixels = inicializa_matriz(col, lin);
 
+	free(tipo_arquivo);
+
 	return pgm;
 }
 
 void destroi_pgm(pgm_t * pgm)
 {
-	free(pgm->matriz_pixels[0]);
-	free(pgm->matriz_pixels);
+	destroi_matriz(pgm->matriz_pixels);
 	free(pgm);
 }
 
@@ -69,6 +56,13 @@ int **inicializa_matriz(int col, int lin)
 	return matriz;
 }
 
+void destroi_matriz(int ** matriz)
+{
+	free(matriz[0]);
+	free(matriz);
+}
+
+
 void info_pgm(pgm_t * pgm)
 {
 	printf("Tipo arquivo: %s\n", pgm->tipo_arquivo);
@@ -86,12 +80,9 @@ int eh_arquivo_p5(pgm_t * pgm)
 	return strcmp(pgm->tipo_arquivo, "P5") == 0;
 }
 
-//Verifica qual o tipo do PGM passado, a entrada (stdin ou argumento), e chama a funcao necessaria para copiar a matriz de pixels da imagem para a struct PGM
-void copia_matriz(pgm_t * pgm, FILE ** image, char * input)
+void copia_matriz_pgm(pgm_t *pgm, int ** matriz)
 {
-	if (eh_arquivo_p2(pgm))
-		copia_matriz_p2(pgm, image);
-
-	if (eh_arquivo_p5(pgm))
-			copia_matriz_p5(pgm, image);
+	for (int i = 0; i < pgm->lin; i++)
+		for (int j = 0; j < pgm->col; j++)
+			matriz[i][j] = pgm->matriz_pixels[i][j];
 }

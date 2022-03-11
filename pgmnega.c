@@ -16,17 +16,17 @@ int main(int argc, char **argv)
 	int col, lin, max;
 
 	//Faz o parsing das entradas
-	//define_io(argc, argv, &input, &output, NULL, NULL, NULL);
-	define_io(argc, argv, &input, &output, NULL, NULL, NULL);
+	parser(argc, argv, &input, &output, NULL, NULL, NULL);
+	exit(1);
 
-	//Verifica se foi passado um arquivo de input como argumento
-	le_entradas(&image, input, &tipo_arquivo, &col, &lin, &max);
+	//Le as propriedades do arquivo pgm, sem ler a matriz de pixels
+	le_propriedades_pgm(&image, input, &tipo_arquivo, &col, &lin, &max);
 
-	//Inicia o arquivo pgm e copia sua matriz de pixels
+	//Inicia a struct pgm com as propriedades definidas
 	pgm_t * pgm = inicializa_pgm(tipo_arquivo, col, lin, max);	
 
-	//Criar função para o bloco, (copia_pgm)
-	copia_matriz(pgm, &image, input);
+	//Copia a matriz de pixels da imagem para a struct pgm
+	le_matriz_pgm(pgm, &image, input);
 
 	//Aplica o filtro negativo na matriz de pixels
 	for (int i = 0; i < pgm->lin; i++)
@@ -34,11 +34,12 @@ int main(int argc, char **argv)
 			pgm->matriz_pixels[i][j] = pgm->max - pgm->matriz_pixels[i][j];
 
 	//Copia o pgm com o filtro aplicado para algum arquivo de saida
-	escreve_saidas(pgm, output);
+	gera_pgm(pgm, output);
 
 	//Fecha o arquivo lido
 	fecha_arquivo(image, input);
 
-	//Desaloca pgm
+	//Fecha arquivo e desaloca estruturas usadas
+	fecha_arquivo(image, input);
 	destroi_pgm(pgm);
 }

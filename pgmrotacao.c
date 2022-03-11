@@ -8,10 +8,11 @@
 
 #define PI 3.14159265 
 
-void copia_matriz_pgm(pgm_t * pgm, int ** matriz);
-
 //Retona 1 se a imagem for quadrada
 int pgm_quadrado(pgm_t * pgm);
+
+//Verifica se um angulo é multiplo de 90
+int eh_mult_noventa(float angulo);
 
 //Altera o tamanho da matriz de pixels do arquivo pgm
 void redimensiona_pgm(pgm_t * pgm, int col, int lin);
@@ -39,29 +40,30 @@ int main(int argc, char **argv)
 	int col, lin, max;
 
 	//Faz o parsing das entradas
-	define_io(argc, argv, &input, &output, &angulo_graus, NULL, NULL);
+	parser(argc, argv, &input, &output, &angulo_graus, NULL, NULL);
 	angulo_rad = angulo_graus * PI / 180;
 
 	//Le as propriedades do arquivo pgm, sem ler a matriz de pixels
-	le_entradas(&image, input, &tipo_arquivo, &col, &lin, &max);
+	le_propriedades_pgm(&image, input, &tipo_arquivo, &col, &lin, &max);
 
 	//Inicia a struct pgm com as propriedades definidas
 	pgm_t * pgm = inicializa_pgm(tipo_arquivo, col, lin, max);	
 
 	//Copia a matriz de pixels da imagem para a struct pgm
-	copia_matriz(pgm, &image, input);
+	le_matriz_pgm(pgm, &image, input);
 
 	matriz_copia = inicializa_matriz(col, lin);
 	copia_matriz_pgm(pgm, matriz_copia);
 
 	identifica_limites(pgm, angulo_rad, &max_col, &max_lin, &repara_col, &repara_lin); 
 
-	// Caso o pgm nao seja quadrado e o angulo de rotacao seja 90, apenas eh trocada linhas por colunas e vice versa
-	if (!pgm_quadrado(pgm) && angulo_graus == 90)
+	// Caso o pgm nao seja quadrado e o angulo de rotacao seja multiplo de 90, apenas eh trocada linhas por colunas e vice versa
+	if (!pgm_quadrado(pgm) && eh_mult_noventa(angulo_graus))
 		redimensiona_pgm(pgm, lin, col);
 
-	// Caso o angulo nao seja de 90, redimensiona o pgm o valor minimo e maximo que um pixel pode assumir
-	if (angulo_graus != 90)
+
+	// Caso o angulo nao seja de multiplo de 90, redimensiona o pgm o valor minimo e maximo que um pixel pode assumir
+	if (!eh_mult_noventa(angulo_graus))
 	{
 		redimensiona_pgm(pgm, max_col, max_lin);
 		desliga_pixels(pgm);
@@ -79,48 +81,38 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (angulo_graus != 90)
+	if (!eh_mult_noventa(angulo_graus))
 	{
 		identifica_limites(pgm, -angulo_rad, &max_col, &max_lin, &repara_col, &repara_lin); 
 		for (int x = 0; x < pgm->lin; x++)
 			for (int y = 0; y < pgm->col; y++)
-			{
 				if (pgm->matriz_pixels[x][y] == -1)
 					pgm->matriz_pixels[x][y] = 255;
-				else
-				{
-					int antigo_x = x * cos(-angulo_rad) + y * sin(-angulo_rad);
-					int antigo_y = x * -sin(-angulo_rad) + y * cos(-angulo_rad);
-
-			
-					pgm->matriz_pixels[x][y] = matriz_copia[antigo_x + repara_lin][antigo_y + repara_col];
-					printf("%d %d %d %d\n", repara_lin, repara_col, antigo_x, antigo_y);
-					exit(0);
-				}
-			}
 	}
 
-	
-
-
 	//Copia o pgm com o filtro aplicado para algum arquivo de saida
-	escreve_saidas(pgm, output);
+	gera_pgm(pgm, output);
+
+	//Fecha arquivo e desaloca estruturas usadas
+	fecha_arquivo(image, input);
+	destroi_matriz(matriz_copia);
+	destroi_pgm(pgm);
 }
 
-void copia_matriz_pgm(pgm_t *pgm, int ** matriz)
-{
-	for (int i = 0; i < pgm->lin; i++)
-		for (int j = 0; j < pgm->col; j++)
-			matriz[i][j] = pgm->matriz_pixels[i][j];
-}
 
 int pgm_quadrado(pgm_t * pgm)
 {	
 	return (pgm->lin == pgm->col);
 }
 
+int eh_mult_noventa(float angulo)
+{
+	return ((int) angulo % 90 == 0);
+}
+
 void redimensiona_pgm(pgm_t * pgm, int col, int lin)
 {
+	free(pgm->matriz_pixels[0]);
 	free(pgm->matriz_pixels);
 
 	pgm->lin = lin;

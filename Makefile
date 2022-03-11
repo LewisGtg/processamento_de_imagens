@@ -2,6 +2,7 @@ OBJETOS = pgm.o arquivos.o parser.o
 EXECUTAVEIS = pgmnega pgmrotacao pgmlimiar pgmmedia pgmmediana pgmlbp
 
 all: $(EXECUTAVEIS)
+	gcc -g -Wall media.c pgm.o arquivos.o parser.o -o media
 
 # Arquivos executaveis
 pgmnega: $(OBJETOS) pgmnega.c
@@ -35,7 +36,7 @@ parser.o: parser.c parser.h
 
 # Limpeza de arquivos
 clean:
-	-rm *.o
+	- rm *.o
 
 purge: clean
-	-rm pgmnega pgmrotacao pgmlimiar pgmmedia pgmmediana pgmlbp
+	- rm pgmnega pgmrotacao pgmlimiar pgmmedia pgmmediana pgmlbp
