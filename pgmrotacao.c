@@ -70,28 +70,57 @@ int main(int argc, char **argv)
 	}
 
 	//Aplica o filtro de rotacao 
-	for (int x = 0; x < lin; x++)
+	if (!eh_mult_noventa(angulo_graus))
 	{
-		for (int y = 0; y < col; y++)
+		for (int x = 0; x < lin; x++)
 		{
-			int novo_x = x * cos(angulo_rad) + y * sin(angulo_rad);
-			int novo_y = x * -sin(angulo_rad) + y * cos(angulo_rad);
+			for (int y = 0; y < col; y++)
+			{
+				int novo_x = x * cos(angulo_rad) + y * sin(angulo_rad);
+				int novo_y = x * -sin(angulo_rad) + y * cos(angulo_rad);
 
-			pgm->matriz_pixels[novo_x + repara_lin][novo_y + repara_col] = matriz_copia[x][y];
+				pgm->matriz_pixels[novo_x + repara_lin][novo_y + repara_col] = matriz_copia[x][y];
+			}
+		}
+	}
+
+	identifica_limites(pgm, -angulo_rad, &max_col, &max_lin, &repara_col, &repara_lin); 
+	for (int x = 0; x < pgm->lin; x++)
+	{
+		for (int y = 0; y < pgm->col; y++)
+		{
+			if (pgm->matriz_pixels[x][y] == -1)
+				pgm->matriz_pixels[x][y] = 255;
+			else
+			{
+				int antigo_x = x * cos(-angulo_rad) + y * sin(-angulo_rad);
+				int antigo_y = x * fabs(-sin(-angulo_rad)) + y * fabs(cos(-angulo_rad));
+
+				printf("%d %d %d %d \n", antigo_x, antigo_y, x, repara_col);
+
+				//pgm->matriz_pixels[x][y] = matriz_copia[x][y];
+			}
 		}
 	}
 
 	if (!eh_mult_noventa(angulo_graus))
 	{
-		identifica_limites(pgm, -angulo_rad, &max_col, &max_lin, &repara_col, &repara_lin); 
 		for (int x = 0; x < pgm->lin; x++)
 			for (int y = 0; y < pgm->col; y++)
+			{
 				if (pgm->matriz_pixels[x][y] == -1)
 					pgm->matriz_pixels[x][y] = 255;
+				else
+				{
+					
+					
+
+				}
+			}
 	}
 
 	//Copia o pgm com o filtro aplicado para algum arquivo de saida
-	gera_pgm(pgm, output);
+	//gera_pgm(pgm, output);
 
 	//Fecha arquivo e desaloca estruturas usadas
 	fecha_arquivo(image, input);

@@ -2,7 +2,6 @@ OBJETOS = pgm.o arquivos.o parser.o
 EXECUTAVEIS = pgmnega pgmrotacao pgmlimiar pgmmedia pgmmediana pgmlbp
 
 all: $(EXECUTAVEIS)
-	gcc -g -Wall media.c pgm.o arquivos.o parser.o -o media
 
 # Arquivos executaveis
 pgmnega: $(OBJETOS) pgmnega.c
