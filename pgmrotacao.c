@@ -81,14 +81,12 @@ int main(int argc, char **argv)
 		}
 	}
 
+	// Liga os pixels que não foram preenchidos novamente
 	if (!eh_mult_noventa(angulo_graus))
-	{
-		identifica_limites(pgm, -angulo_rad, &max_col, &max_lin, &repara_col, &repara_lin); 
 		for (int x = 0; x < pgm->lin; x++)
 			for (int y = 0; y < pgm->col; y++)
 				if (pgm->matriz_pixels[x][y] == -1)
 					pgm->matriz_pixels[x][y] = 255;
-	}
 
 	//Copia o pgm com o filtro aplicado para algum arquivo de saida
 	gera_pgm(pgm, output);
@@ -99,17 +97,19 @@ int main(int argc, char **argv)
 	destroi_pgm(pgm);
 }
 
-
+// Pgm possui proporcoes quadradas
 int pgm_quadrado(pgm_t * pgm)
 {	
 	return (pgm->lin == pgm->col);
 }
 
+// Retorna 1 se o angulo for multiplo de 90
 int eh_mult_noventa(float angulo)
 {
 	return ((int) angulo % 90 == 0);
 }
 
+// Altera o tamanho do pgm, e cria uma nova matriz com as novas medidas
 void redimensiona_pgm(pgm_t * pgm, int col, int lin)
 {
 	free(pgm->matriz_pixels[0]);
@@ -121,6 +121,7 @@ void redimensiona_pgm(pgm_t * pgm, int col, int lin)
 	pgm->matriz_pixels = inicializa_matriz(col, lin);
 }
 
+// Seta todos os pixels para 0
 void desliga_pixels(pgm_t * pgm)
 {
 	for (int i = 0; i < pgm->lin; i++)
@@ -128,21 +129,27 @@ void desliga_pixels(pgm_t * pgm)
 			pgm->matriz_pixels[i][j] = -1;
 }
 
+// Identifica os limites do pgm (tamanho máximo de linhas e colunas) após uma rotação
 void identifica_limites(pgm_t *pgm, double angulo_rad, int * max_col, int * max_lin, int * repara_col, int * repara_lin)
 {
+	// Valores máximos após a rotação
 	*max_col = 0;
 	*max_lin = 0;
+
+	// Variaveis para arrumar as coordenadas para uma posição valida
 	*repara_col = 0;
 	*repara_lin = 0;
 
 	for (int x = 0; x < pgm->lin; x++)
 		for (int y = 0; y < pgm->col; y++)
 		{
+			//Calcula uma rotação de uma posição válida
 			if (pgm->matriz_pixels[x][y] != -1)
 			{
 				int novo_x = x * cos(angulo_rad) + y * sin(angulo_rad);
 				int novo_y = x * -sin(angulo_rad) + y * cos(angulo_rad);
 
+				//Define os minimos e máximos, também, o valor das variaveis de reparação
 				if (novo_x >= *max_lin)
 					*max_lin = novo_x + 1;
 
@@ -157,6 +164,7 @@ void identifica_limites(pgm_t *pgm, double angulo_rad, int * max_col, int * max_
 			}
 		}
 
+	// Retorna o valor absoluto
 	*repara_col = abs(*repara_col);
 	*repara_lin = abs(*repara_lin);
 
